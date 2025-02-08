@@ -1,5 +1,8 @@
 # Laravel Metadata
 
+[![Tests](https://github.com/splitstack/laravel-metamon/actions/workflows/tests.yml/badge.svg)](https://github.com/splitstack/laravel-metamon/actions/workflows/tests.yml)
+![PHP Version Support](https://img.shields.io/badge/php-%3E%3D8.1-blue)
+
 A Laravel package for handling model metadata with role-based access control.
 
 ## Installation

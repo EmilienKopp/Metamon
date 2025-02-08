@@ -6,7 +6,7 @@
   displayDetailsOnTestsThatTriggerWarnings="true" testdox="true">
   <testsuites>
     <testsuite name="Metamon Test Suite">
-      <directory suffix="Test.php">./tests</directory>
+      <directory suffix="Test.php">./src/Tests</directory>
     </testsuite>
   </testsuites>
   <coverage>
@@ -18,7 +18,7 @@
   <php>
     <env name="DB_CONNECTION" value="pgsql" />
     <env name="DB_HOST" value="127.0.0.1" />
-    <env name="DB_PORT" value="5432" />
+    <env name="DB_PORT" value="54329" />
     <env name="DB_DATABASE" value="testing" />
     <env name="DB_USERNAME" value="postgres" />
     <env name="DB_PASSWORD" value="password" />

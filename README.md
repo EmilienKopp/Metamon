@@ -2,7 +2,7 @@
 
 ![Tests](https://img.shields.io/github/actions/workflow/status/emilienkopp/metamon/tests.yml?label=tests)
 ![PHP Version](https://img.shields.io/badge/php-%5E8.1-blue)
-![Laravel Version](https://img.shields.io/badge/laravel-8.x%20%7C%209.x%20%7C%2010.x-red)
+![Laravel Version](https://img.shields.io/badge/laravel-11.x-red)
 
 A Laravel package for handling model metadata with role-based access control.
 

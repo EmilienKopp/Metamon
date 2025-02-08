@@ -19,11 +19,11 @@ composer require splitstack/laravel-metamon
 1. Add the HasMetadata trait to your model:
 
 ```php
-use YourVendor\LaravelMetadata\HasMetadata;
+use Splitstack\Metamon\HandlesMetadata;
 
 class YourModel extends Model
 {
-    use HasMetadata;
+    use HandlesMetadata;
 }
 ```
 

@@ -13,6 +13,8 @@ docker compose exec php composer install
 # Run tests with coverage
 docker compose exec php vendor/bin/phpunit --coverage-html coverage
 
+start coverage/index.html
+
 # Keep containers running unless specified otherwise
 if [ "$1" == "--down" ]; then
     docker compose down

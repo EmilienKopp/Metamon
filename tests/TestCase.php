@@ -44,7 +44,8 @@ class TestCase extends Orchestra
     ]);
     
     // Metadata configuration
-    $app['config']->set('metamon.roles.admin', ['allowed_key']);
+    $app['config']->set('metamon.roles.admin', ['*']);
+    $app['config']->set('metamon.roles.user', ['allowed_key']);
   }
 
   protected function setUpDatabase()

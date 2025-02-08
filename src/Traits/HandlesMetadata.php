@@ -4,23 +4,21 @@ namespace Splitstack\Metamon\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Splitstack\Metamon\Exceptions\MetadataAccessDeniedException;
+use Splitstack\Metamon\Exceptions\MetadataException;
+use Splitstack\Metamon\Validators\MetadataValidator;
 
 trait HandlesMetadata
 {
   protected $metadataColumn = 'metadata';
+  protected ?MetadataValidator $validator = null;
 
-  /**
-   * Boot the trait, ensuring that metadata is an empty array on saving.
-   */
-  protected static function bootHasMetadata()
+  protected function getValidator(): MetadataValidator
   {
-    static::saving(function (Model $model) {
-      $metadataColumn = $model->getMetadataColumn();
-      if (!is_array($model->{$metadataColumn})) {
-        $model->{$metadataColumn} = [];
-      }
-    });
+    if ($this->validator === null) {
+      $this->validator = new MetadataValidator();
+    }
+    return $this->validator;
   }
 
   /**
@@ -32,9 +30,15 @@ trait HandlesMetadata
    * @param mixed|null $value
    * @return mixed
    */
-  public function metadata(string $key, $value = null)
+  public function meta(string $key = null, $value = null)
   {
-    if (is_null($value)) {
+    if(is_null($key)) {
+      return json_decode(json_encode($this->{$this->getMetadataColumn()}), false);
+    }
+
+    $this->getValidator()->validateKeyFormat($key);
+
+    if ($value === null) {
       return $this->getMetadata($key);
     } else {
       return $this->setMetadata($key, $value);
@@ -92,6 +96,9 @@ trait HandlesMetadata
   {
     $exploded = explode('.', $key);
     $topLevelKey = array_shift($exploded);
+
+    $topLevelKey = $this->sanitize($topLevelKey);
+    $value = $this->sanitize($value);
     
     $whereString = "{$this->getMetadataColumn()}->{$topLevelKey}";
     foreach ($exploded as $nestedKey) {
@@ -124,13 +131,14 @@ trait HandlesMetadata
    *
    * @throws \Exception
    */
-  public function setMetadata($key, $value = null, string $role = null): self
+  public function setMetadata(string|array|int $key, $value = null, string $role = null): self
   {
     $allowedKeys = $this->getAllowedMetadataKeys($role);
-    if (!in_array('*', $allowedKeys) && !Arr::has($allowedKeys, $key)) {
-      throw new \Exception("Key '{$key}' is not allowed for role '{$role}'");
+    if (!in_array('*', $allowedKeys) && !in_array($key, $allowedKeys)) {
+      throw new MetadataAccessDeniedException("Key '{$key}' is not allowed for role '{$role}'");
     }
 
+    $this->getValidator()->validateValueSize($value);
     return $this->addMetadata($key, $value);
   }
 
@@ -141,15 +149,27 @@ trait HandlesMetadata
    * @param mixed|null $value
    * @return $this
    */
-  protected function addMetadata($key, $value = null): self
+  protected function addMetadata(string|array|int $key, $value = null): self
   {
     $metadata = $this->{$this->getMetadataColumn()};
-    if (is_array($key)) {
-      $metadata = array_merge($metadata, $key);
-    } else {
-      Arr::set($metadata, $key, $value);
+    $this->getValidator()->validateKeyFormat($key);
+    try {
+      if (is_array($key)) {
+      $this->getValidator()->validateArrayKeyCount($key);
+        $metadata = array_merge($metadata, $key);
+      } else {
+      $this->getValidator()->validateNestingDepth($key);
+        Arr::set($metadata, $key, $value);
+      }
+      
+      $this->getValidator()->validateTotalSize($metadata);
+      $this->validate($metadata);
+      
+      
+      $this->{$this->getMetadataColumn()} = $metadata;
+    } catch (\JsonException $e) {
+      throw new MetadataException('Failed to process metadata: ' . $e->getMessage());
     }
-    $this->{$this->getMetadataColumn()} = $metadata;
 
     return $this;
   }
@@ -162,8 +182,22 @@ trait HandlesMetadata
    */
   public function getAllowedMetadataKeys(?string $role): array
   {
+    $this->getValidator()->validateRoleFormat($role);
     $role = empty($role) ? 'default' : $role;
     $rolesConfig = config('metamon.roles', []);
     return $rolesConfig[$role] ?? [];
+  }
+
+  private function sanitize($value)
+  {
+    if (is_string($value)) {
+      return preg_replace('/[^a-zA-Z0-9_]/', '', $value);
+    }
+    return $value;
+  }
+
+  private function validate($metadata): void
+  {
+    $this->getValidator()->validate($metadata);
   }
 }

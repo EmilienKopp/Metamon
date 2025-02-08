@@ -43,15 +43,18 @@ $table->json('metadata')->nullable();
 
 ```php
 // Get metadata
-$model->metadata('key');
+$model->meta('key');
 $model->getMetadata('key', 'default');
+$model->getMetadata('nested.key');
+$model->meta()->key;
 
 // Set metadata
-$model->metadata('key', 'value');
+$model->meta('key', 'value');
 $model->setMetadata('key', 'value', 'admin');
 
 // Check if metadata exists
 $model->hasMetadata('key');
+
 
 // Remove metadata
 $model->forgetMetadata('key');

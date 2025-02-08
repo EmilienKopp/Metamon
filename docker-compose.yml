@@ -10,7 +10,7 @@ services:
     environment:
       - DB_CONNECTION=pgsql
       - DB_HOST=db
-      - DB_PORT=54329
+      - DB_PORT=5432
       - DB_DATABASE=testing
       - DB_USERNAME=postgres
       - DB_PASSWORD=password

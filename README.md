@@ -2,7 +2,7 @@
 
 ![Tests](https://img.shields.io/github/actions/workflow/status/emilienkopp/metamon/tests.yml?label=tests)
 ![PHP Version](https://img.shields.io/badge/php-%5E8.1-blue)
-![Laravel Version](https://img.shields.io/badge/laravel-8.x%20%7C%209.x%20%7C%2010.x-red)
+![Laravel Version](https://img.shields.io/badge/laravel-11.x-red)
 [![Total Downloads](https://img.shields.io/packagist/dt/splitstack/laravel-metamon.svg?style=flat-square)](https://packagist.org/packages/splitstack/laravel-metamon)
 
 A Laravel package for handling model metadata with role-based access control.
@@ -20,11 +20,11 @@ composer require splitstack/laravel-metamon
 1. Add the HasMetadata trait to your model:
 
 ```php
-use YourVendor\LaravelMetadata\HasMetadata;
+use Splitstack\Metamon\HandlesMetadata;
 
 class YourModel extends Model
 {
-    use HasMetadata;
+    use HandlesMetadata;
 }
 ```
 
@@ -44,15 +44,18 @@ $table->json('metadata')->nullable();
 
 ```php
 // Get metadata
-$model->metadata('key');
+$model->meta('key');
 $model->getMetadata('key', 'default');
+$model->getMetadata('nested.key');
+$model->meta()->key;
 
 // Set metadata
-$model->metadata('key', 'value');
+$model->meta('key', 'value');
 $model->setMetadata('key', 'value', 'admin');
 
 // Check if metadata exists
 $model->hasMetadata('key');
+
 
 // Remove metadata
 $model->forgetMetadata('key');

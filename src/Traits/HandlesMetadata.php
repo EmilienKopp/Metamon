@@ -177,6 +177,9 @@ trait HandlesMetadata
     try {
       if (is_array($key)) {
       $this->getValidator()->validateArrayKeyCount($key);
+        if($metadata === null) {
+          $metadata = [];
+        }
         $metadata = array_merge($metadata, $key);
       } else {
       $this->getValidator()->validateNestingDepth($key);

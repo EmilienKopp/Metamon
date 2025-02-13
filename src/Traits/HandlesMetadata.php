@@ -7,11 +7,32 @@ use Illuminate\Database\Eloquent\Builder;
 use Splitstack\Metamon\Exceptions\MetadataAccessDeniedException;
 use Splitstack\Metamon\Exceptions\MetadataException;
 use Splitstack\Metamon\Validators\MetadataValidator;
+use Illuminate\Database\Eloquent\Model;
 
 trait HandlesMetadata
 {
   protected $metadataColumn = 'metadata';
   protected ?MetadataValidator $validator = null;
+
+  /**
+   * Boot the trait, ensuring that metadata is an empty array on saving.
+   */
+  protected static function bootHasMetadata()
+  {
+    static::saving(function (Model $model) {
+      $metadataColumn = $model->getMetadataColumn();
+      if (!is_array($model->{$metadataColumn})) {
+        $model->{$metadataColumn} = [];
+      }
+    });
+
+    static::retrieved(function (Model $model) {
+      $metadataColumn = $model->getMetadataColumn();
+      if ($model->{$metadataColumn} === null) {
+        $model->{$metadataColumn} = [];
+      }
+    });
+  }
 
   protected function getValidator(): MetadataValidator
   {

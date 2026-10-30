@@ -16,7 +16,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator = new MetadataValidator();
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_key_format()
     {
         // Valid key
@@ -34,7 +34,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateKeyFormat(str_repeat('a', 256));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_value_size()
     {
         // Valid values
@@ -47,7 +47,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateValueSize(str_repeat('a', 65536));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_array_key_count()
     {
         // Valid array
@@ -58,7 +58,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateArrayKeyCount(array_fill(0, 101, 'value'));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_nesting_depth()
     {
         // Valid nesting
@@ -69,7 +69,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateNestingDepth('l1.l2.l3.l4.l5.l6.17');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_total_size()
     {
         // Valid size
@@ -85,7 +85,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateTotalSize($largeData);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_role_format()
     {
         // Valid roles
@@ -99,7 +99,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateRoleFormat('invalid@role');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_key_length()
     {
         // Valid keys
@@ -120,7 +120,7 @@ class MetadataValidatorTest extends TestCase
         $this->validator->validateKeyFormat('valid.' . str_repeat('a', 64));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_json_encoding()
     {
         // Valid metadata

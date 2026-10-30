@@ -27,7 +27,7 @@ class HandlesMetadataTest extends TestCase
     ]);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_set_config_properly()
   {
     $expected = [
@@ -38,7 +38,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals($expected, config('metamon.roles'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_throws_on_invalid_role_format()
   {
     $this->expectException(\Splitstack\Metamon\Exceptions\InvalidMetadataKeyException::class);
@@ -54,30 +54,30 @@ class HandlesMetadataTest extends TestCase
     $this->model->setMetadata('allowed_key', 'value', 'invalid~role');
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_throws_on_access_denied()
   {
-    config(['metadata.roles.guest' => ['allowed_key']]);
+    config(['metamon.roles.guest' => ['allowed_key']]);
 
     $this->expectException(\Splitstack\Metamon\Exceptions\MetadataAccessDeniedException::class);
 
     $this->model->setMetadata('restricted_key', 'value', 'guest');
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_set_and_get_metadata()
   {
     $this->model->setMetadata('test_key', 'test_value');
     $this->assertEquals('test_value', $this->model->getMetadata('test_key'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_retrieve_metadata()
   {
     $this->assertEquals('some_value', $this->model->getMetadata('initial'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_persist_and_retrieve_metadata()
   {
     $this->model->setMetadata('test_key', 'test_value');
@@ -86,7 +86,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals('test_value', $this->model->getMetadata('test_key'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_check_if_metadata_exists()
   {
     $this->model->setMetadata('test_key', 'test_value');
@@ -95,7 +95,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertFalse($this->model->hasMetadata('nonexistent_key'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_be_passed_associative_arrays()
   {
     $array = [
@@ -109,7 +109,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals('value', $this->model->getMetadata('second'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function associative_arrays_do_merge_instead_of_overwriting()
   {
     $this->model->setMetadata('test_key', 'test_value');
@@ -120,14 +120,14 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals('other_value', $this->model->getMetadata('other_key'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_access_with_dot_notation()
   {
     $this->assertEquals('value', $this->model->getMetadata('nested.key'));
     $this->assertEquals('value', $this->model->getMetadata('supernested.first_level.second_level'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_use_meta_shorthand_without_argument_to_return_object()
   {
     $object = $this->model->meta();
@@ -135,7 +135,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals('some_value', $object->initial);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_use_meta_shorthand_without_argument_to_access_nested()
   {
     $val = $this->model->meta()->initial;
@@ -144,7 +144,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals('value', $otherVal);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_get_and_set_with_shorthand()
   {
     $this->model->meta('test_key', 'test_value');
@@ -156,17 +156,16 @@ class HandlesMetadataTest extends TestCase
     $this->assertNotNull($found);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_get_with_shorthand_and_dot_notation()
   {
     $this->model->meta('nested.key', 'new_value');
     $this->assertEquals('new_value', $this->model->meta()->nested->key);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_safely_handles_sql_injection_in_metadata_keys()
   {
-    $this->expectException(\Illuminate\Database\QueryException::class);
     $maliciousKeys = [
       "';DROP TABLE test_models;--",
       "metadata->>'$.key' = 'value' OR 1=1;--",
@@ -177,8 +176,9 @@ class HandlesMetadataTest extends TestCase
     ];
 
     foreach ($maliciousKeys as $maliciousKey) {
-      $this->expectException(\Illuminate\Database\QueryException::class);
       $result = TestModel::whereMetadata($maliciousKey, 'any_value')->get();
+      $this->assertEmpty($result, "SQL injection attempt with key: {$maliciousKey} should return no results");
+      $this->assertDatabaseHas('test_models', ['id' => $this->model->id]);
     }
 
     $maliciousNestedKeys = [
@@ -193,7 +193,7 @@ class HandlesMetadataTest extends TestCase
     }
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_safely_handles_sql_injection_in_metadata_values()
   {
 
@@ -219,7 +219,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEmpty($result, "SQL injection attempt with object value should return no results: " . json_encode($asObj));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_generates_expected_sql_for_nested_paths()
   {
     \DB::enableQueryLog();
@@ -238,7 +238,7 @@ class HandlesMetadataTest extends TestCase
     \DB::disableQueryLog();
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_persist_and_retrieve_with_meta_shorthand_dot_notation()
   {
     $this->model->meta('nested.key', 'deezNuts');
@@ -251,7 +251,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals($this->model->id, $found->id);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_forget_metadata()
   {
     $this->model->setMetadata('test_key', 'test_value');
@@ -260,7 +260,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertFalse($this->model->hasMetadata('test_key'));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_query_by_metadata()
   {
     $this->model->setMetadata('test_key', 'test_value');
@@ -272,7 +272,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals($this->model->id, $found->id);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_can_query_by_nested_metadata()
   {
     $found = TestModel::whereMetadata('nested.key', 'value')->first();
@@ -284,7 +284,7 @@ class HandlesMetadataTest extends TestCase
     $this->assertEquals($this->model->id, $found->id);
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_respects_role_based_access()
   {
     $this->expectException(\Splitstack\Metamon\Exceptions\MetadataAccessDeniedException::class);
@@ -292,7 +292,7 @@ class HandlesMetadataTest extends TestCase
     $this->model->setMetadata('restricted_key', 'value', 'user');
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_throws_on_value_length_over_65535()
   {
     $this->expectException(\Splitstack\Metamon\Exceptions\MetadataException::class);
@@ -300,7 +300,7 @@ class HandlesMetadataTest extends TestCase
     $this->model->setMetadata('allowed_key', str_repeat('a', 65536));
   }
 
-  /** @test */
+  #[\PHPUnit\Framework\Attributes\Test]
   public function it_throws_on_key_length_over_63()
   {
     $this->expectException(\Splitstack\Metamon\Exceptions\InvalidMetadataKeyException::class);

@@ -11,7 +11,7 @@
     }
   ],
   "scripts": {
-    "test": "./vendor/bin/phpunit --colors=always --no-coverage",
+    "test": "./vendor/bin/pest --colors=always --no-coverage",
     "test:full": "run-tests.sh",
     "test:coverage": "docker compose exec php vendor/bin/phpunit --colors=always --coverage-html coverage && start coverage/index.html"
   },
@@ -22,7 +22,12 @@
   },
   "require-dev": {
     "orchestra/testbench": "^8.31|^9.0|^10.0|^11.0",
-    "phpunit/phpunit": "^10.5|^11.5|^12.0"
+    "pestphp/pest": "^2.36|^3.0|^4.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   },
   "autoload": {
     "psr-4": {

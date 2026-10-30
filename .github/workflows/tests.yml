@@ -2,14 +2,14 @@ name: Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:latest
@@ -26,31 +26,40 @@ jobs:
           --health-retries 5
 
     strategy:
+      fail-fast: false
       matrix:
-        php-versions: ['8.1', '8.2']
+        php-versions: ["8.2", "8.3", "8.4", "8.5"]
+        laravel: ["^11.0", "^12.0", "^13.0"]
+        exclude:
+          # skip Laravel 13 on PHP 8.2 (framework requires PHP >= 8.3)
+          - php-versions: "8.2"
+            laravel: "^13.0"
+          # skip Laravel 11 on PHP 8.5 (framework supports up to PHP 8.4)
+          - php-versions: "8.5"
+            laravel: "^11.0"
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-versions }}
-        extensions: pdo, pdo_pgsql
-        coverage: xdebug
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: pdo, pdo_pgsql
+          coverage: xdebug
 
-    - name: Copy .env.testing
-      run: php -r "file_exists('.env.testing') || copy('.env.testing.example', '.env.testing');"
+      - name: Copy .env.testing
+        run: php -r "file_exists('.env.testing') || copy('.env.testing.example', '.env.testing');"
 
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install Dependencies
+        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --with illuminate/support:${{ matrix.laravel }} --with illuminate/database:${{ matrix.laravel }}
 
-    - name: Execute tests via PHPUnit
-      env:
-        DB_CONNECTION: pgsql
-        DB_HOST: localhost
-        DB_PORT: 5432
-        DB_DATABASE: testing
-        DB_USERNAME: postgres
-        DB_PASSWORD: postgres
-      run: vendor/bin/phpunit --coverage-text
+      - name: Execute tests via Pest
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: testing
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+        run: vendor/bin/pest --coverage-text

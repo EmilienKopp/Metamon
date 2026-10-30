@@ -1,7 +1,7 @@
 {
   "name": "splitstack/laravel-metamon",
   "description": "A Laravel package for handling model metadata with role-based access control",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -16,9 +16,9 @@
     "test:coverage": "docker compose exec php vendor/bin/phpunit --colors=always --coverage-html coverage && start coverage/index.html"
   },
   "require": {
-    "php": "^8.1",
-    "illuminate/support": "^9.0|^10.0|^11.0|^12.0|^13.0",
-    "illuminate/database": "^9.0|^10.0|^11.0|^12.0|^13.0"
+    "php": "^8.2",
+    "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+    "illuminate/database": "^10.0|^11.0|^12.0|^13.0"
   },
   "require-dev": {
     "orchestra/testbench": "^8.31|^9.0|^10.0|^11.0",

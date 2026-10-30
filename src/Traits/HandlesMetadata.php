@@ -141,6 +141,7 @@ trait HandlesMetadata
     return Arr::has($metadata, $key);
   }
 
+
   /**
    * Set a value in the metadata with role-based key restrictions.
    * Uses dot notation for nested keys.
@@ -155,7 +156,8 @@ trait HandlesMetadata
   public function setMetadata(string|array|int $key, $value = null, string $role = null): self
   {
     $allowedKeys = $this->getAllowedMetadataKeys($role);
-    if (!in_array('*', $allowedKeys) && !in_array($key, $allowedKeys)) {
+    // If no roles config is defined or if allowed keys is empty, allow any key
+    if (!empty($allowedKeys) && !in_array('*', $allowedKeys) && !in_array($key, $allowedKeys)) {
       throw new MetadataAccessDeniedException("Key '{$key}' is not allowed for role '{$role}'");
     }
 
@@ -200,15 +202,24 @@ trait HandlesMetadata
 
   /**
    * Get allowed metadata keys for a specific role.
+   * Returns empty array if no roles config is defined,
+   * which will result in all keys being allowed.
    *
    * @param string|null $role
    * @return array
    */
   public function getAllowedMetadataKeys(?string $role): array
   {
+    // If no config exists at all, return empty array to allow all keys
+    if (!config()->has('metamon.roles')) {
+      return [];
+    }
+
     $this->getValidator()->validateRoleFormat($role);
     $role = empty($role) ? 'default' : $role;
     $rolesConfig = config('metamon.roles', []);
+
+    // If the role doesn't exist in config, return empty array to allow all keys
     return $rolesConfig[$role] ?? [];
   }
 

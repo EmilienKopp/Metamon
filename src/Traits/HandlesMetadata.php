@@ -123,7 +123,7 @@ trait HandlesMetadata
     
     $whereString = "{$this->getMetadataColumn()}->{$topLevelKey}";
     foreach ($exploded as $nestedKey) {
-      $whereString .= "->{$nestedKey}";
+      $whereString .= "->{$this->sanitize($nestedKey)}";
     }
 
     return $query->where($whereString, $value);

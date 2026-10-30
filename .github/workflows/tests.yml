@@ -52,7 +52,11 @@ jobs:
         run: php -r "file_exists('.env.testing') || copy('.env.testing.example', '.env.testing');"
 
       - name: Install Dependencies
-        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --with illuminate/support:${{ matrix.laravel }} --with illuminate/database:${{ matrix.laravel }}
+        # advisory blocking off: EOL framework versions (e.g. Laravel 11) have
+        # unpatched advisories and would be uninstallable in the test matrix
+        run: |
+          composer config policy.advisories.block false
+          composer update --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --with illuminate/support:${{ matrix.laravel }} --with illuminate/database:${{ matrix.laravel }}
 
       - name: Execute tests via Pest
         env:

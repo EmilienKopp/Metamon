@@ -17,7 +17,7 @@ trait HandlesMetadata
   /**
    * Boot the trait, ensuring that metadata is an empty array on saving.
    */
-  protected static function bootHasMetadata()
+  protected static function bootHandlesMetadata()
   {
     static::saving(function (Model $model) {
       $metadataColumn = $model->getMetadataColumn();
@@ -51,7 +51,7 @@ trait HandlesMetadata
    * @param mixed|null $value
    * @return mixed
    */
-  public function meta(string $key = null, $value = null)
+  public function meta(?string $key = null, $value = null)
   {
     if(is_null($key)) {
       return json_decode(json_encode($this->{$this->getMetadataColumn()}), false);
@@ -83,7 +83,7 @@ trait HandlesMetadata
    * @param mixed|null $default
    * @return mixed
    */
-  public function getMetadata(string $key = null, $default = null)
+  public function getMetadata(?string $key = null, $default = null)
   {
     $metadata = $this->{$this->getMetadataColumn()};
     return $key ? Arr::get($metadata, $key, $default) : $metadata;
@@ -153,7 +153,7 @@ trait HandlesMetadata
    *
    * @throws \Exception
    */
-  public function setMetadata(string|array|int $key, $value = null, string $role = null): self
+  public function setMetadata(string|array|int $key, $value = null, ?string $role = null): self
   {
     $allowedKeys = $this->getAllowedMetadataKeys($role);
     // If no roles config is defined or if allowed keys is empty, allow any key

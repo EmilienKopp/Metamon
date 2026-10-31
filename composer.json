@@ -1,7 +1,6 @@
 {
   "name": "splitstack/laravel-metamon",
   "description": "A Laravel package for handling model metadata with role-based access control",
-  "version": "2.0.0",
   "type": "library",
   "license": "MIT",
   "authors": [
